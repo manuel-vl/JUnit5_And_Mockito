@@ -35,4 +35,46 @@ class CuentaTest {
         // Validamos que el saldo sea mayor a cero
         assertTrue(current.compareTo(BigDecimal.ZERO)>0);
     }
+
+    @Test
+    void testReferenciaCuenta() {
+        // Arrange
+        Cuenta cuenta1=new Cuenta("John Doe", new BigDecimal("8900.9987"));
+        Cuenta cuenta2=new Cuenta("John Doe", new BigDecimal("8900.9987"));
+
+        // Act & Assert
+        assertEquals(cuenta2, cuenta1);
+    }
+
+    @Test
+    void testDebitoCuenta() {
+        // Arrange
+        Cuenta cuenta=new Cuenta("Manuel", new BigDecimal("1000.1234"));
+
+        // Act
+        Integer expectedInt= 900;
+        String expectedBig="900.1234";
+        cuenta.debito(new BigDecimal(100));
+
+        // Assert
+        assertNotNull(cuenta.getSaldo());
+        assertEquals(expectedInt, cuenta.getSaldo().intValue());
+        assertEquals(expectedBig, cuenta.getSaldo().toPlainString());
+    }
+
+    @Test
+    void testCreditoCuenta(){
+        // Arrange
+        Cuenta cuenta=new Cuenta("Manuel", new BigDecimal("1000.1234"));
+
+        // Act
+        Integer expectedInt= 1100;
+        String expectedBig="1100.1234";
+        cuenta.credito(new BigDecimal(100));
+
+        // Assert
+        assertNotNull(cuenta.getSaldo());
+        assertEquals(expectedInt, cuenta.getSaldo().intValue());
+        assertEquals(expectedBig, cuenta.getSaldo().toPlainString());
+    }
 }
