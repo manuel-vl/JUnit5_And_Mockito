@@ -2,6 +2,7 @@ package org.manuelvl.devweb.models;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+import org.manuelvl.devweb.exceptions.DineroInsuficienteException;
 
 import java.math.BigDecimal;
 
@@ -76,5 +77,22 @@ class CuentaTest {
         assertNotNull(cuenta.getSaldo());
         assertEquals(expectedInt, cuenta.getSaldo().intValue());
         assertEquals(expectedBig, cuenta.getSaldo().toPlainString());
+    }
+
+    @Test
+    void testDineroInsuficienteException(){
+        // Arrange
+        Cuenta cuenta=new Cuenta("Manuel", new BigDecimal("1000.1234"));
+
+        // Act & Assert
+        Exception exception= assertThrows(DineroInsuficienteException.class, ()->{
+            // Como no tenemos ese monto, se debe lanzar excepcion
+           cuenta.debito(new BigDecimal(1500));
+        });
+
+        String current=exception.getMessage();
+        String expected="Dinero Insuficiente";
+
+        assertEquals(expected, current);
     }
 }

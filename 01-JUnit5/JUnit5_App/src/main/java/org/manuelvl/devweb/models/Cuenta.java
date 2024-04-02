@@ -1,5 +1,7 @@
 package org.manuelvl.devweb.models;
 
+import org.manuelvl.devweb.exceptions.DineroInsuficienteException;
+
 import java.math.BigDecimal;
 
 public class Cuenta {
@@ -31,7 +33,14 @@ public class Cuenta {
     }
 
     public void debito(BigDecimal monto){
-        this.saldo=this.saldo.subtract(monto);
+        BigDecimal nuevoSaldo=this.saldo.subtract(monto);
+
+        // Si el nuevo saldo es menor a 0, retornamos el error
+        if(nuevoSaldo.compareTo(BigDecimal.ZERO)<0){
+            throw new DineroInsuficienteException("Dinero Insuficiente");
+        }
+
+        this.saldo=nuevoSaldo;
     }
 
     public void credito(BigDecimal monto){
