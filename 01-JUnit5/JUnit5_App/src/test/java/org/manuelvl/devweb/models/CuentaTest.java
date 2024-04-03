@@ -5,15 +5,16 @@ import org.junit.jupiter.api.Test;
 import org.manuelvl.devweb.exceptions.DineroInsuficienteException;
 
 import java.math.BigDecimal;
+import java.util.stream.Collectors;
 
 class CuentaTest {
     @Test
     void testNombreCuenta() {
         // Arrange
         Cuenta cuenta=new Cuenta("Manuel", new BigDecimal("1200.13456"));
+        String expected="Manuel";
 
         // Act
-        String expected="Manuel";
         String current=cuenta.getPersona();
 
         // Assert
@@ -24,9 +25,9 @@ class CuentaTest {
     void testSaldoCuenta(){
         // Arrange
         Cuenta cuenta=new Cuenta("Manuel", new BigDecimal("1000.12345"));
+        BigDecimal expected= BigDecimal.valueOf(1000.12345);
 
         // Act
-        BigDecimal expected= BigDecimal.valueOf(1000.12345);
         BigDecimal current=cuenta.getSaldo();
 
         // Assert
@@ -51,10 +52,10 @@ class CuentaTest {
     void testDebitoCuenta() {
         // Arrange
         Cuenta cuenta=new Cuenta("Manuel", new BigDecimal("1000.1234"));
-
-        // Act
         Integer expectedInt= 900;
         String expectedBig="900.1234";
+
+        // Act
         cuenta.debito(new BigDecimal(100));
 
         // Assert
@@ -67,10 +68,10 @@ class CuentaTest {
     void testCreditoCuenta(){
         // Arrange
         Cuenta cuenta=new Cuenta("Manuel", new BigDecimal("1000.1234"));
-
-        // Act
         Integer expectedInt= 1100;
         String expectedBig="1100.1234";
+
+        // Act
         cuenta.credito(new BigDecimal(100));
 
         // Assert
@@ -83,6 +84,7 @@ class CuentaTest {
     void testDineroInsuficienteException(){
         // Arrange
         Cuenta cuenta=new Cuenta("Manuel", new BigDecimal("1000.1234"));
+        String expected="Dinero Insuficiente";
 
         // Act & Assert
         Exception exception= assertThrows(DineroInsuficienteException.class, ()->{
@@ -91,8 +93,47 @@ class CuentaTest {
         });
 
         String current=exception.getMessage();
-        String expected="Dinero Insuficiente";
 
         assertEquals(expected, current);
+    }
+
+    @Test
+    void testTransferirDineroCuentas() {
+        // Arrange
+        Cuenta cuentaOrigen=new Cuenta("Manuel", new BigDecimal("2500"));
+        Cuenta cuentaDestino=new Cuenta("Manuel", new BigDecimal("2000"));
+        Banco banco=new Banco();
+
+        // Act
+        banco.transferir(cuentaOrigen, cuentaDestino, new BigDecimal(500));
+
+        // Assert
+        assertEquals("2000", cuentaOrigen.getSaldo().toPlainString());
+        assertEquals("2500", cuentaDestino.getSaldo().toPlainString());
+    }
+
+    @Test
+    void testRelacionBancoCuentas(){
+        // Arrange
+        Cuenta cuenta1=new Cuenta("Manuel", new BigDecimal("2500"));
+        Cuenta cuenta2=new Cuenta("Valencia", new BigDecimal("2000"));
+        Banco banco=new Banco();
+        banco.setNombre("Bancolombia");
+
+        // Act
+        banco.addCuenta(cuenta1);
+        banco.addCuenta(cuenta2);
+
+        // Assert
+        assertAll(
+                ()->assertEquals(2, banco.getCuentas().size()),
+                ()-> assertEquals("Bancolombia", cuenta1.getBanco().getNombre()),
+                ()-> assertEquals("Manuel", banco.getCuentas().stream()
+                            .filter(cuenta -> cuenta.getPersona().equalsIgnoreCase("Manuel"))
+                            .findFirst()
+                            .get().getPersona()),
+                ()-> assertTrue(banco.getCuentas().stream()
+                            .anyMatch(cuenta -> cuenta.getPersona().equalsIgnoreCase("Manuel")))
+        );
     }
 }
