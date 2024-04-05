@@ -2,21 +2,47 @@ package org.manuelvl.devweb.models;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.*;
 import org.manuelvl.devweb.exceptions.DineroInsuficienteException;
 
 import java.math.BigDecimal;
+import java.util.Properties;
 
 class CuentaTest {
+    Cuenta cuenta;
+
+    // BeforeAll -> Se ejecuta antes de todos los metodos una sola vez
+    @BeforeAll
+    static void beforeAll() {
+        System.out.println("Inicializando el test.");
+    }
+
+    // AfterAll -> Se ejecuta al final de las pruebas una sola vez
+    @AfterAll
+    static void afterAll() {
+        System.out.println("Finalizando el test.");
+    }
+
+    // BeforeEach -> Se ejecuta una vez antes de cada metodo
+    @BeforeEach
+    void initMethodTest(){
+        this.cuenta=new Cuenta("Manuel", new BigDecimal("1200.12345"));
+        System.out.println("Iniciando metodo.");
+    }
+
+    // AfterEach -> Se ejecuta una vez despues de cada metodo
+    @AfterEach
+    void tearDown(){
+        System.out.println("Finalizando metodo.");
+    }
+
     @Test
     // Disable deshabilita la prueba
     @Disabled
     @DisplayName("Test para probar el nombre de la cuenta")
     void testNombreCuenta() {
         // Arrange
-        Cuenta cuenta=new Cuenta("Manuel", new BigDecimal("1200.13456"));
         String expected="Manuel";
 
         // Act
@@ -32,8 +58,7 @@ class CuentaTest {
     @DisplayName("Test para probar el saldo de la cuenta")
     void testSaldoCuenta(){
         // Arrange
-        Cuenta cuenta=new Cuenta("Manuel", new BigDecimal("1000.12345"));
-        BigDecimal expected= BigDecimal.valueOf(1000.12345);
+        BigDecimal expected= BigDecimal.valueOf(1200.12345);
 
         // Act
         BigDecimal current=cuenta.getSaldo();
@@ -61,9 +86,8 @@ class CuentaTest {
     @DisplayName("Test para probar el debito a una cuenta")
     void testDebitoCuenta() {
         // Arrange
-        Cuenta cuenta=new Cuenta("Manuel", new BigDecimal("1000.1234"));
-        Integer expectedInt= 900;
-        String expectedBig="900.1234";
+        Integer expectedInt= 1100;
+        String expectedBig="1100.12345";
 
         // Act
         cuenta.debito(new BigDecimal(100));
@@ -78,9 +102,8 @@ class CuentaTest {
     @DisplayName("Test para probar el credito a una cuenta")
     void testCreditoCuenta(){
         // Arrange
-        Cuenta cuenta=new Cuenta("Manuel", new BigDecimal("1000.1234"));
-        Integer expectedInt= 1100;
-        String expectedBig="1100.1234";
+        Integer expectedInt= 1300;
+        String expectedBig="1300.12345";
 
         // Act
         cuenta.credito(new BigDecimal(100));
@@ -95,7 +118,6 @@ class CuentaTest {
     @DisplayName("Test para probar que se lance la excepcion de Dinero Insuficiente")
     void testDineroInsuficienteException(){
         // Arrange
-        Cuenta cuenta=new Cuenta("Manuel", new BigDecimal("1000.1234"));
         String expected="Dinero Insuficiente";
 
         // Act & Assert
@@ -149,5 +171,52 @@ class CuentaTest {
                 ()-> assertTrue(banco.getCuentas().stream()
                             .anyMatch(cuenta -> cuenta.getPersona().equalsIgnoreCase("Manuel")))
         );
+    }
+
+    @Test
+    // Condicional para que solo se ejecute en OS Windows
+    @EnabledOnOs(OS.WINDOWS)
+    void testOnlyWindows(){
+        System.out.println("Test solo windows");
+    }
+
+    @Test
+    @EnabledOnOs({OS.LINUX, OS.MAC})
+    void testOnlyMacLinux() {
+        System.out.println("Test solo en Mac");
+    }
+
+    @Test
+    // Condicional para que no se ejecute en Windows
+    @DisabledOnOs(OS.WINDOWS)
+    void testNoWindows(){
+        System.out.println("No se ejecuta en Windows");
+    }
+
+    @Test
+    // Condicional para que solo se ejecute en Java JDK 8
+    @EnabledOnJre(JRE.JAVA_8)
+    void onlyJDK8() {
+        System.out.println("Test solo Java 8");
+    }
+
+    @Test
+    void showProperties(){
+        // Obteniendo las propiedades del computador
+        Properties properties=System.getProperties();
+        properties.forEach((k,v)-> System.out.println(k + ":"+v));
+    }
+
+    @Test
+    // Condicional para validar si coincide la propiedad del sistema indicada
+    @EnabledIfSystemProperty(named="java.specification.version", matches = "17")
+    void testPropertyJavaVersion(){
+        System.out.println("Test version 17");
+    }
+
+    @Test
+    @EnabledIfSystemProperty(named = "ENV", matches = "dev")
+    void testDev(){
+        System.out.println("Test dev");
     }
 }
