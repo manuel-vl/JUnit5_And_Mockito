@@ -1,14 +1,19 @@
 package org.manuelvl.devweb.models;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.manuelvl.devweb.exceptions.DineroInsuficienteException;
 
 import java.math.BigDecimal;
-import java.util.stream.Collectors;
 
 class CuentaTest {
     @Test
+    // Disable deshabilita la prueba
+    @Disabled
+    @DisplayName("Test para probar el nombre de la cuenta")
     void testNombreCuenta() {
         // Arrange
         Cuenta cuenta=new Cuenta("Manuel", new BigDecimal("1200.13456"));
@@ -18,10 +23,13 @@ class CuentaTest {
         String current=cuenta.getPersona();
 
         // Assert
-        assertEquals(expected, current);
+        assertNotNull(current, ()->"La cuenta no puede ser nula");
+        assertEquals(expected, current, ()->"El nombre de la cuenta no es el esperado");
+        assertTrue(current.equals(expected),()-> "El nombre de la cuenta debe ser igual al esperado");
     }
 
     @Test
+    @DisplayName("Test para probar el saldo de la cuenta")
     void testSaldoCuenta(){
         // Arrange
         Cuenta cuenta=new Cuenta("Manuel", new BigDecimal("1000.12345"));
@@ -39,6 +47,7 @@ class CuentaTest {
     }
 
     @Test
+    @DisplayName("Test para probar si dos cuentas son iguales")
     void testReferenciaCuenta() {
         // Arrange
         Cuenta cuenta1=new Cuenta("John Doe", new BigDecimal("8900.9987"));
@@ -49,6 +58,7 @@ class CuentaTest {
     }
 
     @Test
+    @DisplayName("Test para probar el debito a una cuenta")
     void testDebitoCuenta() {
         // Arrange
         Cuenta cuenta=new Cuenta("Manuel", new BigDecimal("1000.1234"));
@@ -65,6 +75,7 @@ class CuentaTest {
     }
 
     @Test
+    @DisplayName("Test para probar el credito a una cuenta")
     void testCreditoCuenta(){
         // Arrange
         Cuenta cuenta=new Cuenta("Manuel", new BigDecimal("1000.1234"));
@@ -81,6 +92,7 @@ class CuentaTest {
     }
 
     @Test
+    @DisplayName("Test para probar que se lance la excepcion de Dinero Insuficiente")
     void testDineroInsuficienteException(){
         // Arrange
         Cuenta cuenta=new Cuenta("Manuel", new BigDecimal("1000.1234"));
@@ -98,6 +110,7 @@ class CuentaTest {
     }
 
     @Test
+    @DisplayName("Test para probar la transferencia de dinero entre cuentas")
     void testTransferirDineroCuentas() {
         // Arrange
         Cuenta cuentaOrigen=new Cuenta("Manuel", new BigDecimal("2500"));
@@ -113,6 +126,7 @@ class CuentaTest {
     }
 
     @Test
+    @DisplayName("Test para probar las relaciones entre banco y cuentas, cuenta y banco")
     void testRelacionBancoCuentas(){
         // Arrange
         Cuenta cuenta1=new Cuenta("Manuel", new BigDecimal("2500"));
@@ -127,7 +141,7 @@ class CuentaTest {
         // Assert
         assertAll(
                 ()->assertEquals(2, banco.getCuentas().size()),
-                ()-> assertEquals("Bancolombia", cuenta1.getBanco().getNombre()),
+                ()-> assertEquals("Bancolombia", cuenta1.getBanco().getNombre(), ()-> "El Banco debe ser igual a Bancolombia"),
                 ()-> assertEquals("Manuel", banco.getCuentas().stream()
                             .filter(cuenta -> cuenta.getPersona().equalsIgnoreCase("Manuel"))
                             .findFirst()
